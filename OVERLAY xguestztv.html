@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>XGUESTZTV — OVERLAY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#7b3ff2;
+    --cyan:#40e0e8;
+    --magenta:#ff2fb0;
+    --ink:#08050f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;}
+  body{font-family:'Chakra Petch','Saira Condensed',sans-serif;position:relative;}
+
+  /* ===== global scanlines ===== */
+  .scanlines{position:absolute;inset:0;pointer-events:none;z-index:50;
+    background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 3px);
+    animation:scan 1s linear infinite;opacity:.7;}
+  @keyframes scan{0%{background-position:0 0;}100%{background-position:0 6px;}}
+
+  .stage{position:absolute;inset:0;}
+
+  /* ===== reusable glitch wordmark ===== */
+  .glitch{position:relative;font-family:'Saira Condensed',sans-serif;font-weight:900;font-style:italic;
+    text-transform:uppercase;line-height:.84;letter-spacing:-.01em;animation:jitter 5s infinite;}
+  .glitch .l{position:absolute;left:0;top:0;color:var(--magenta);opacity:.65;transform:translate(-3px,0);}
+  .glitch .r{position:absolute;left:0;top:0;color:var(--cyan);opacity:.65;transform:translate(3px,0);}
+  .glitch .m{position:relative;color:#f5efff;}
+  @keyframes jitter{0%,88%,100%{transform:translate(0,0);}90%{transform:translate(-2px,1px);}93%{transform:translate(2px,-1px);}96%{transform:translate(-1px,0);}}
+
+  /* ===== top-left brand tag ===== */
+  .brand{position:absolute;top:40px;left:48px;display:flex;align-items:center;gap:16px;z-index:20;}
+  .brand .mark{width:66px;height:66px;border-radius:14px;background:var(--ink);border:1px solid #2c1d4a;
+    display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+  .brand .mark:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px);}
+  .brand .mark span{position:relative;font-family:'Saira Condensed',sans-serif;font-weight:900;font-style:italic;
+    font-size:34px;letter-spacing:-.05em;color:#fff;text-shadow:2px 0 var(--magenta),-2px 0 var(--cyan);}
+  .brand .wm{font-family:'Saira Condensed',sans-serif;font-weight:900;font-style:italic;font-size:40px;
+    text-transform:uppercase;letter-spacing:.01em;color:#f2ecff;}
+  .brand .wm b{color:var(--purple);}
+
+  /* ===== LIVE badge top-right ===== */
+  .live{position:absolute;top:44px;right:48px;display:flex;align-items:center;gap:12px;z-index:20;
+    background:var(--magenta);border-radius:9px;padding:12px 20px;box-shadow:0 0 26px rgba(255,47,176,.5);}
+  .live .dot{width:12px;height:12px;border-radius:50%;background:#fff;animation:pulse 1.4s infinite;}
+  .live .txt{font-family:'Share Tech Mono',monospace;font-size:20px;font-weight:700;color:#fff;letter-spacing:.22em;text-transform:uppercase;}
+  @keyframes pulse{0%,100%{opacity:.4;transform:scale(.8);}50%{opacity:1;transform:scale(1.1);}}
+
+  /* ===== signal markers ===== */
+  .sig{position:absolute;font-family:'Share Tech Mono',monospace;font-size:16px;letter-spacing:.24em;z-index:20;text-transform:uppercase;}
+  .sig.tl{top:120px;left:48px;color:var(--cyan);}
+  .sig.br{bottom:26px;left:50%;transform:translateX(-50%);color:var(--magenta);opacity:.8;}
+
+  /* ===== webcam frame bottom-left ===== */
+  .cam{position:absolute;left:48px;bottom:56px;width:520px;height:300px;z-index:15;}
+  .cam .border{position:absolute;inset:0;border:4px solid var(--purple);
+    clip-path:polygon(0 0,calc(100% - 40px) 0,100% 40px,100% 100%,40px 100%,0 calc(100% - 40px));
+    box-shadow:0 0 30px rgba(123,63,242,.45) inset,0 0 22px rgba(123,63,242,.4);}
+  .cam .grid{position:absolute;inset:4px;
+    clip-path:polygon(0 0,calc(100% - 38px) 0,100% 38px,100% 100%,38px 100%,0 calc(100% - 38px));
+    background:repeating-linear-gradient(0deg,rgba(123,63,242,.04) 0 1px,transparent 1px 26px);opacity:.6;}
+  .cam .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:'Share Tech Mono',monospace;font-size:15px;letter-spacing:.2em;color:#4b3d6b;text-transform:uppercase;}
+  .cam .name{position:absolute;left:22px;bottom:20px;display:flex;align-items:center;gap:11px;
+    background:var(--ink);border:1px solid #2c1d4a;border-radius:9px;padding:9px 16px;}
+  .cam .name .xg{width:34px;height:34px;border-radius:7px;background:#100a1e;display:flex;align-items:center;justify-content:center;
+    font-family:'Saira Condensed',sans-serif;font-weight:900;font-style:italic;font-size:18px;color:#fff;text-shadow:1px 0 var(--magenta),-1px 0 var(--cyan);}
+  .cam .name .nm{font-family:'Saira Condensed',sans-serif;font-weight:800;font-style:italic;font-size:24px;text-transform:uppercase;color:#e9e2f7;letter-spacing:.02em;}
+  .cam .name .nm b{color:var(--purple);}
+
+  /* ===== lower third "AHORA JUGANDO" bottom-right ===== */
+  .now{position:absolute;right:48px;bottom:56px;z-index:15;display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
+  .now .card{display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,#0d0819,#1a1030);
+    border:1px solid #2c1d4a;border-radius:12px;padding:16px 22px;overflow:hidden;position:relative;min-width:360px;justify-content:flex-end;}
+  .now .card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--purple);}
+  .now .bar{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+  .now .k{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;}
+  .now .t{font-family:'Saira Condensed',sans-serif;font-weight:900;font-style:italic;font-size:34px;text-transform:uppercase;color:#f5efff;letter-spacing:.01em;}
+  .now .stripes{position:absolute;right:0;top:0;bottom:0;width:120px;opacity:.35;
+    background:repeating-linear-gradient(115deg,var(--purple) 0 10px,transparent 10px 26px);}
+
+  /* ===== follow alert (looping demo) center-top ===== */
+  .alert{position:absolute;top:180px;left:50%;transform:translateX(-50%);z-index:40;
+    display:flex;align-items:center;gap:20px;background:linear-gradient(90deg,#1a0f30,#0d0819);
+    border:2px solid var(--cyan);border-radius:18px;padding:22px 34px;box-shadow:0 0 40px rgba(64,224,232,.3);
+    opacity:0;animation:alertLoop 12s infinite;}
+  .alert .icon{width:64px;height:64px;border-radius:12px;background:var(--ink);border:1px solid #2c1d4a;
+    display:flex;align-items:center;justify-content:center;font-family:'Saira Condensed',sans-serif;font-weight:900;font-style:italic;
+    font-size:30px;color:#fff;text-shadow:2px 0 var(--magenta),-2px 0 var(--cyan);}
+  .alert .col{display:flex;flex-direction:column;gap:3px;}
+  .alert .k{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:.24em;color:var(--cyan);text-transform:uppercase;}
+  .alert .big{font-family:'Saira Condensed',sans-serif;font-weight:900;font-style:italic;font-size:40px;text-transform:uppercase;color:#f5efff;line-height:.9;}
+  .alert .big u{text-decoration:none;color:var(--purple);}
+  .alert .sub{font-family:'Chakra Petch',sans-serif;font-size:16px;color:#9d90b8;text-transform:uppercase;letter-spacing:.04em;}
+  @keyframes alertLoop{
+    0%{opacity:0;transform:translateX(-50%) translateY(-24px) scale(.96);}
+    4%{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}
+    30%{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}
+    36%{opacity:0;transform:translateX(-50%) translateY(-24px) scale(.96);}
+    100%{opacity:0;transform:translateX(-50%) translateY(-24px) scale(.96);}
+  }
+  .alert .shine{position:absolute;top:0;bottom:0;width:60px;background:linear-gradient(90deg,transparent,rgba(64,224,232,.4),transparent);
+    animation:shine 3s linear infinite;}
+  @keyframes shine{0%{transform:translateX(-80px);}100%{transform:translateX(560px);}}
+</style>
+</head>
+<body>
+  <div class="stage">
+
+    <!-- brand top-left -->
+    <div class="brand">
+      <div class="mark"><span>XG</span></div>
+      <div class="wm">XGUESTZ<b>TV</b></div>
+    </div>
+    <div class="sig tl">[ SIGNAL ]</div>
+
+    <!-- LIVE top-right -->
+    <div class="live"><span class="dot"></span><span class="txt">LIVE</span></div>
+
+    <!-- webcam frame -->
+    <div class="cam">
+      <div class="border"></div>
+      <div class="grid"></div>
+      <div class="hint">CÁMARA</div>
+      <div class="name">
+        <div class="xg">XG</div>
+        <div class="nm">XGUESTZ<b>TV</b></div>
+      </div>
+    </div>
+
+    <!-- now playing bottom-right -->
+    <div class="now">
+      <div class="card">
+        <span class="stripes"></span>
+        <div class="bar">
+          <span class="k">AHORA JUGANDO</span>
+          <span class="t">RANKED · SOLO Q</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- follow alert demo -->
+    <div class="alert">
+      <span class="shine"></span>
+      <div class="icon">XG</div>
+      <div class="col">
+        <span class="k">NUEVO SEGUIDOR</span>
+        <span class="big">¡BIENVENIDO, <u>NOMBRE</u>!</span>
+        <span class="sub">GRACIAS POR SEGUIR EL CANAL</span>
+      </div>
+    </div>
+
+    <div class="sig br">NO_SIGNAL_LOSS</div>
+
+    <!-- global scanlines -->
+    <div class="scanlines"></div>
+  </div>
+</body>
+</html>
